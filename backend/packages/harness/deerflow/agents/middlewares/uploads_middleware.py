@@ -221,17 +221,20 @@ class UploadsMiddleware(AgentMiddleware[UploadsMiddlewareState]):
                 thread_id = get_config().get("configurable", {}).get("thread_id")
             except RuntimeError:
                 pass  # get_config() raises outside a runnable context (e.g. unit tests)
+        
+        # Question: 这个中间件后于ThreadDataMiddleware, 此时agent state中应该已经带有upload_path, 为什么不从那里取?
         uploads_dir = self._paths.sandbox_uploads_dir(thread_id) if thread_id else None
 
         # Get newly uploaded files from the current message's additional_kwargs.files
-        new_files = self._files_from_kwargs(last_message, uploads_dir) or []
+        new_files = self._files_from_kwargs(last_message, uploads_dir) or [] # 前端上传的文件被单独处理, 这里只有文件元数据
 
         # Collect historical files from the uploads directory (all except the new ones)
         new_filenames = {f["filename"] for f in new_files}
         historical_files: list[dict] = []
         if uploads_dir and uploads_dir.exists():
-            for file_path in sorted(uploads_dir.iterdir()):
+            for file_path in sorted(uploads_dir.iterdir()): # Question: 这里按名字排序是为了让agent每次看到的文件顺序一致, 避免同一批文件在不同轮次出现顺序变化导致的混乱吗?
                 if file_path.is_file() and file_path.name not in new_filenames:
+                    # 把不在new_filenames中的文件加入historical_files列表
                     stat = file_path.stat()
                     outline, preview = _extract_outline_for_file(file_path)
                     historical_files.append(

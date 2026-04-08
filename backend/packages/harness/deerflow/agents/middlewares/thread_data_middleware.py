@@ -10,7 +10,7 @@ from deerflow.agents.thread_state import ThreadDataState
 from deerflow.config.paths import Paths, get_paths
 
 logger = logging.getLogger(__name__)
-
+# Question: 中间件的state和agent的state有什么关系?
 
 class ThreadDataMiddlewareState(AgentState):
     """Compatible with the `ThreadState` schema."""
@@ -33,7 +33,7 @@ class ThreadDataMiddleware(AgentMiddleware[ThreadDataMiddlewareState]):
     
     """
     - workspace: agent的草稿纸, 中间状态的文件放在这个目录下
-    - uploads: agent上传的文件会放在这个目录下, 供agent后续使用
+    - uploads: 用户上传的文件会放在这个目录下, 供agent后续使用
     - outputs: agent的最终输出文件会放在这个目录下, 供用户下载
     """
 
