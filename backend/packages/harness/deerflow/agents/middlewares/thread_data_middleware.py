@@ -30,6 +30,12 @@ class ThreadDataMiddleware(AgentMiddleware[ThreadDataMiddlewareState]):
     - With lazy_init=True (default): Only compute paths, directories created on-demand
     - With lazy_init=False: Eagerly create directories in before_agent()
     """
+    
+    """
+    - workspace: agent的草稿纸, 中间状态的文件放在这个目录下
+    - uploads: agent上传的文件会放在这个目录下, 供agent后续使用
+    - outputs: agent的最终输出文件会放在这个目录下, 供用户下载
+    """
 
     state_schema = ThreadDataMiddlewareState
 
