@@ -317,6 +317,7 @@ def make_lead_agent(config: RunnableConfig):
     if "metadata" not in config:
         config["metadata"] = {}
 
+    # 追踪调用配置
     config["metadata"].update(
         {
             "agent_name": agent_name or "default",

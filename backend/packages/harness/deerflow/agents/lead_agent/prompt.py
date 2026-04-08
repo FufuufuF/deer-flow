@@ -26,6 +26,7 @@ def clear_skills_system_prompt_cache() -> None:
 
 
 def _build_skill_evolution_section(skill_evolution_enabled: bool) -> str:
+    # 自动更新Skill的工作流
     if not skill_evolution_enabled:
         return ""
     return """

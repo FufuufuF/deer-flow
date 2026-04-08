@@ -67,8 +67,8 @@ def create_deerflow_agent(
     features: RuntimeFeatures | None = None,
     extra_middleware: list[AgentMiddleware] | None = None,
     plan_mode: bool = False,
-    state_schema: type | None = None,
-    checkpointer: BaseCheckpointSaver | None = None,
+    state_schema: type | None = None, # 运行时state
+    checkpointer: BaseCheckpointSaver | None = None, # 可选的持久化后端
     name: str = "default",
 ) -> CompiledStateGraph:
     """Create a DeerFlow agent from plain Python arguments.
@@ -122,6 +122,7 @@ def create_deerflow_agent(
     if middleware is not None:
         effective_middleware = list(middleware)
     else:
+        # 没有传入midlleware列表时使用features参数自动组装middleware链，并将feature相关工具添加到tools列表
         feat = features or RuntimeFeatures()
         effective_middleware, extra_tools = _assemble_from_features(
             feat,

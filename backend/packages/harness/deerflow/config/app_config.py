@@ -39,6 +39,10 @@ def _default_config_candidates() -> tuple[Path, ...]:
 
 class AppConfig(BaseModel):
     """Config for the DeerFlow application"""
+    """
+        AppConfig用于汇总所有配置类
+        配置的加载顺序: 临时指定 -> 上下文覆盖 -> 环境变量解析(来源于config.yaml) -> config.yaml文件加载
+    """
 
     log_level: str = Field(default="info", description="Logging level for deerflow modules (debug/info/warning/error)")
     token_usage: TokenUsageConfig = Field(default_factory=TokenUsageConfig, description="Token usage tracking configuration")
@@ -251,13 +255,13 @@ class AppConfig(BaseModel):
         return next((group for group in self.tool_groups if group.name == name), None)
 
 
-_app_config: AppConfig | None = None
+_app_config: AppConfig | None = None # 用一个全局变量缓存加载的实例
 _app_config_path: Path | None = None
-_app_config_mtime: float | None = None
+_app_config_mtime: float | None = None # 修改事件, 用于热更新
 _app_config_is_custom = False
 _current_app_config: ContextVar[AppConfig | None] = ContextVar("deerflow_current_app_config", default=None)
 _current_app_config_stack: ContextVar[tuple[AppConfig | None, ...]] = ContextVar("deerflow_current_app_config_stack", default=())
-
+# 带有`ContextVar`的变量是由每个协程调用链单独享有的, 防止临时覆盖时污染全局配置
 
 def _get_config_mtime(config_path: Path) -> float | None:
     """Get the modification time of a config file if it exists."""
